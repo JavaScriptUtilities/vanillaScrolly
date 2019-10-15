@@ -1,6 +1,6 @@
 /*
  * Plugin Name: Vanilla-JS Scrolly
- * Version: 0.1.0
+ * Version: 0.1.1
  * Plugin URL: https://javascriptutilities.github.io/vanillaScrolly/
  * JavaScriptUtilities Vanilla-JS may be freely distributed under the MIT license.
  */
@@ -24,12 +24,14 @@ var vanillaScrolly = function($item, args) {
     args.callback = args.callback && typeof args.callback == 'function' ? args.callback : function($item, percent, step) {
         // console.log(percent, step);
     };
+    args.callbackresize = args.callbackresize && typeof args.callbackresize == 'function' ? args.callbackresize : function($item, $parent) {};
 
     /* Set items
     -------------------------- */
 
     $parent.style.position = 'relative';
     $item.style.position = 'sticky';
+    $item.style.top = 0;
 
     /* Set steps
     -------------------------- */
@@ -44,7 +46,7 @@ var vanillaScrolly = function($item, args) {
             nb_steps = 0;
             return false;
         }
-        var nb_steps_area = nb_steps - 1,
+        var nb_steps_area = Math.max(nb_steps - 1, 2),
             area_size = 100 / nb_steps_area,
             _min, _max;
         for (var i = 1; i <= nb_steps; i++) {
@@ -62,6 +64,7 @@ var vanillaScrolly = function($item, args) {
     -------------------------- */
 
     function setValues() {
+        args.callbackresize($item, $parent);
         bound = $item.getBoundingClientRect();
         parent_bound = $parent.getBoundingClientRect();
         scroll100 = parent_bound.height - bound.height;
