@@ -31,6 +31,9 @@
         <script>
         (function(){
             new vanillaScrolly(document.getElementById('sticky'), {
+                /* Minimal width */
+                minScreenWidth: 300,
+                /* Custom callback */
                 callback:  function($item, percent, step) {
                     console.log(percent);
                 }

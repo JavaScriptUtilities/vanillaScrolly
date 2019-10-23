@@ -1,14 +1,16 @@
 /*
  * Plugin Name: Vanilla-JS Scrolly
- * Version: 0.1.1
+ * Version: 0.2.0
  * Plugin URL: https://javascriptutilities.github.io/vanillaScrolly/
  * JavaScriptUtilities Vanilla-JS may be freely distributed under the MIT license.
  */
 
 var vanillaScrolly = function($item, args) {
+    'use strict';
 
     var $parent = $item.parentNode,
         currentStep,
+        windowTooNarrow = false,
         nb_steps = 0,
         steps = [],
         bound,
@@ -21,10 +23,17 @@ var vanillaScrolly = function($item, args) {
     if (typeof args != 'object') {
         args = {};
     }
+
+    /* Custom callback on scroll */
     args.callback = args.callback && typeof args.callback == 'function' ? args.callback : function($item, percent, step) {
         // console.log(percent, step);
     };
+
+    /* Custom callback on resize */
     args.callbackresize = args.callbackresize && typeof args.callbackresize == 'function' ? args.callbackresize : function($item, $parent) {};
+
+    /* Disable under this screen width */
+    args.minScreenWidth = args.minScreenWidth && typeof args.minScreenWidth == 'number' ? args.minScreenWidth : 0;
 
     /* Set items
     -------------------------- */
@@ -38,7 +47,6 @@ var vanillaScrolly = function($item, args) {
 
     (function() {
         if (!$item.hasAttribute('data-steps') || !parseInt($item.getAttribute('data-steps'), 10)) {
-            console.log($item.parentNode);
             return;
         }
         nb_steps = parseInt($item.getAttribute('data-steps'), 10);
@@ -68,6 +76,7 @@ var vanillaScrolly = function($item, args) {
         bound = $item.getBoundingClientRect();
         parent_bound = $parent.getBoundingClientRect();
         scroll100 = parent_bound.height - bound.height;
+        windowTooNarrow = window.innerWidth < args.minScreenWidth;
     }
     window.addEventListener('resize', setValues);
     setValues();
@@ -76,6 +85,9 @@ var vanillaScrolly = function($item, args) {
     -------------------------- */
 
     function scrollEvent() {
+        if (windowTooNarrow) {
+            return;
+        }
         var percent = $item.offsetTop / scroll100 * 100;
         var step = 0;
         if (nb_steps) {
